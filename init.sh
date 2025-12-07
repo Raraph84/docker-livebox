@@ -40,6 +40,17 @@ ip6tables -A FORWARD -i $LAN_INTERFACE -o $WAN_INTERFACE.832 -j ACCEPT
 ip6tables -D FORWARD -i $WAN_INTERFACE.832 -o $LAN_INTERFACE -m state --state ESTABLISHED,RELATED -j ACCEPT || true
 ip6tables -A FORWARD -i $WAN_INTERFACE.832 -o $LAN_INTERFACE -m state --state ESTABLISHED,RELATED -j ACCEPT
 
+if ! iptables-save | grep -q DOCKER; then
+    iptables -D INPUT -i docker0 -j ACCEPT || true
+    iptables -A INPUT -i docker0 -j ACCEPT
+    iptables -D FORWARD -i docker0 -j ACCEPT || true
+    iptables -A FORWARD -i docker0 -j ACCEPT
+    iptables -D FORWARD -o docker0 -m state --state ESTABLISHED,RELATED -j ACCEPT || true
+    iptables -A FORWARD -o docker0 -m state --state ESTABLISHED,RELATED -j ACCEPT
+    iptables -D POSTROUTING -t nat -s 172.17.0.0/16 ! -o docker0 -j MASQUERADE || true
+    iptables -A POSTROUTING -t nat -s 172.17.0.0/16 ! -o docker0 -j MASQUERADE
+fi
+
 echo Done setting up networking
 
 /usr/local/bin/up-fiber.sh
