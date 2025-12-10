@@ -3,13 +3,11 @@ FROM debian:13@sha256:0d01188e8dd0ac63bf155900fad49279131a876a1ea7fac917c62e87cc
 ARG DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends build-essential git && \
+    apt-get install -y --no-install-recommends build-essential git ca-certificates && \
+    update-ca-certificates && \
     git clone --depth 1 https://github.com/Raraph84/dhclient-orange-patched /tmp/dhclient-orange-patched && \
     cd /tmp/dhclient-orange-patched && \
-    ./configure && make -j$(( $(nproc) + 1 )) && make install && \
-    rm -rf /tmp/dhclient-orange-patched && \
-    apt-get purge -y --auto-remove build-essential git && \
-    rm -rf /var/lib/apt/lists/*
+    ./configure && make -j$(( $(nproc) + 1 )) && make install
 
 FROM debian:13-slim@sha256:e711a7b30ec1261130d0a121050b4ed81d7fb28aeabcf4ea0c7876d4e9f5aca2
 
