@@ -1,23 +1,25 @@
+FROM debian:13@sha256:0d01188e8dd0ac63bf155900fad49279131a876a1ea7fac917c62e87ccb2732d AS builder
+
+ARG DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends build-essential git && \
+    git clone --depth 1 https://github.com/Raraph84/dhclient-orange-patched /tmp/dhclient-orange-patched && \
+    cd /tmp/dhclient-orange-patched && \
+    ./configure && make -j$(( $(nproc) + 1 )) && make install
+
 FROM debian:13-slim@sha256:e711a7b30ec1261130d0a121050b4ed81d7fb28aeabcf4ea0c7876d4e9f5aca2
 
 ARG DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update && \
-    apt-get install --no-install-recommends -y supervisor iproute2 iptables gettext-base ca-certificates && \
-    update-ca-certificates && \
+    apt-get install --no-install-recommends -y supervisor iproute2 iptables gettext-base && \
     apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+    rm -rf /var/lib/apt/lists/* && \
+    mkdir -p /var/lib/dhcp /etc/dhclient-enter-hooks.d /etc/dhclient-exit-hooks.d
 
-RUN set -eux; \
-    apt-get update && apt-get install -y --no-install-recommends build-essential git && \
-    git clone --depth 1 https://github.com/Raraph84/dhclient-orange-patched /tmp/dhclient-orange-patched && \
-    cd /tmp/dhclient-orange-patched && \
-    ./configure && make && make install && \
-    cp /tmp/dhclient-orange-patched/client/scripts/linux /sbin/dhclient-script && chmod +x /sbin/dhclient-script && \
-    mkdir -p /var/lib/dhcp /etc/dhclient-enter-hooks.d /etc/dhclient-exit-hooks.d && \
-    rm -rf /tmp/dhclient-orange-patched && \
-    apt-get purge -y --auto-remove build-essential git && apt-get clean && rm -rf /var/lib/apt/lists/*
-
+COPY --from=builder /tmp/dhclient-orange-patched/client/scripts/linux /sbin/dhclient-script
+COPY --from=builder /usr/local/sbin/dhclient /usr/local/sbin/dhclient
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 COPY init.sh /usr/local/bin/init.sh
 COPY up-fiber.sh /usr/local/bin/up-fiber.sh
@@ -31,7 +33,8 @@ RUN chmod +x /usr/local/bin/init.sh \
     /etc/dhcp/dhclient-orange-generator.sh \
     /usr/local/bin/up-fiber.sh \
     /etc/dhclient-enter-hooks.d/no-dns \
-    /etc/dhclient-exit-hooks.d/setup-ipv6
+    /etc/dhclient-exit-hooks.d/setup-ipv6 \
+    /sbin/dhclient-script
 
 ENV LAN_INTERFACE=eth0
 ENV WAN_INTERFACE=eth1
