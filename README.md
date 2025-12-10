@@ -78,6 +78,13 @@ docker build -t livebox .
 - The container emulates a Livebox 5 (Sagem) for authentication purposes
 - IPv6 prefix delegation is configured to provide IPv6 connectivity to your LAN
 
+## Acknowledgments
+
+Special thanks to:
+
+- The **[lafibre.info](https://lafibre.info/)** community for their valuable knowledge and support regarding Orange fiber connections
+- The **[orange-bypass-debian](https://github.com/akhamar/orange-bypass-debian)** project, which provided significant help and inspiration for this implementation
+
 ## License
 
 This project is provided as-is for educational and personal use.
