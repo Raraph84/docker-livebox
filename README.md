@@ -1,9 +1,11 @@
 # Docker Livebox
 
-- **GitHub**: https://github.com/Raraph84/docker-livebox
-- **Docker Hub**: https://hub.docker.com/r/raraph84/livebox
+<img width="500" height="370" alt="livebian" src="https://github.com/user-attachments/assets/4bb8b1cc-d348-4bcb-87e8-51cf093fc70b" />
 
 A simple Docker image that transforms your host into an Orange Livebox, allowing you to bypass the Orange Livebox router and use your own hardware with Orange fiber (FTTH) in France.
+
+- **GitHub**: https://github.com/Raraph84/docker-livebox
+- **Docker Hub**: https://hub.docker.com/r/raraph84/livebox
 
 ## Overview
 
