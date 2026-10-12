@@ -1,4 +1,4 @@
-FROM debian:13@sha256:0d01188e8dd0ac63bf155900fad49279131a876a1ea7fac917c62e87ccb2732d
+FROM debian:13
 
 RUN apt-get update
 RUN apt-get install -y supervisor iproute2 iptables gettext-base
